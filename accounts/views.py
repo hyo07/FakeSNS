@@ -127,17 +127,8 @@ class PasswordChangeDone(LoginRequiredMixin, PasswordChangeDoneView):
 @login_required
 def black_list(request, pk):
     if request.method == 'POST':
-        # req_profile = Profile.objects.get(user_id=request.user.id)
-        # text = req_profile.black_list
-
         # ブラックリストへ追加
         if "add_bl" in request.POST:
-            # new_bl = BlackList.add_bl(text, str(pk))
-            # profile = Profile.objects.get(user_id=request.user.id)
-            # profile.black_list = new_bl
-            # profile.save()
-            # messages.success(request, "ブラックリストに追加しました")
-            # return redirect('accounts:user_detail', pk=request.user.id)
             bl = BlackListM.objects.create(add_user_id=request.user.id, target_user_id=pk)
             bl.save()
             messages.success(request, "ブラックリストに追加しました")
@@ -145,10 +136,6 @@ def black_list(request, pk):
 
         # ブラックリストから削除
         elif "del_bl" in request.POST:
-            # new_bl = BlackList.delete_bl(text, str(pk))
-            # profile = Profile.objects.get(user_id=request.user.id)
-            # profile.black_list = new_bl
-            # profile.save()
             bl = BlackListM.objects.get(add_user_id=request.user.id, target_user_id=pk)
             bl.delete()
             messages.success(request, "ブラックリストから削除しました")
