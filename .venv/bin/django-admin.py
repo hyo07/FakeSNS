@@ -1,4 +1,4 @@
-#!/Users/yutaka/python/FakeSNS/.venv/bin/python3.6
+#!/Users/yutaka/python/FakeSNS/.venv/bin/python
 from django.core import management
 
 if __name__ == "__main__":

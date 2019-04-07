@@ -25,7 +25,7 @@ class Article(models.Model):
 class Profile(models.Model):
     introduction = models.TextField("自己紹介", blank=True)
     sex = models.CharField("性別", max_length=2, choices=GENDER_CHOICES, blank=True)
-    black_list = models.TextField("ブラックリスト", blank=True, default="", editable=False)
+    # black_list = models.TextField("ブラックリスト", blank=True, default="", editable=False)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -38,4 +38,10 @@ class Profile(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='like_user')
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class BlackListM(models.Model):
+    add_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='bl_add')
+    target_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='bl_target')
     created_at = models.DateTimeField(auto_now_add=True)

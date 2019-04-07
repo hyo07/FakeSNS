@@ -31,31 +31,23 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                {% if profile %}
-                    <ul><li><p>登録されているブラックリストはありません</p></li></ul>
-                {% else %}
-                    <ul><li><p>ユーザー情報を登録すると、ブラックリスト機能が使用可能になります</p></li></ul>
-                {% endif %}
+                <ul><li><p>登録されているブラックリストはありません</p></li></ul>
             {% endif %}
         {% endif %}
     {% endif %}
 
 
     {% if user.id != request.user.id  %}
-        {% if profile %}
-            <form method="post" action="{% url 'accounts:black_list' user.id %}">
-                {% csrf_token %}
-                {% if user.id in black_list %}
-                    <label><strong>このユーザーをブラックリストから削除しますか？</strong></label>
-                    <input type="submit" name="del_bl" value="BL削除">
-                {% else %}
-                    <label><strong>このユーザーをブラックリストに追加しますか？</strong></label>
-                    <input type="submit" name="add_bl" value="BL追加">
-                {% endif %}
-            </form>
-        {% else %}
-            <strong>ユーザー情報を登録すると、ブラックリスト機能が使用可能になります</strong>
-        {% endif %}
+        <form method="post" action="{% url 'accounts:black_list' user.id %}">
+            {% csrf_token %}
+            {% if user.id in black_list %}
+                <label><strong>このユーザーをブラックリストから削除しますか？</strong></label>
+                <input type="submit" name="del_bl" value="BL削除">
+            {% else %}
+                <label><strong>このユーザーをブラックリストに追加しますか？</strong></label>
+                <input type="submit" name="add_bl" value="BL追加">
+            {% endif %}
+        </form>
     {% endif %}
 
     ----------------------------------------------------------

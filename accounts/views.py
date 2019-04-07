@@ -9,9 +9,8 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from app.models import Profile, Article, Like
+from app.models import Profile, Article, Like, BlackListM
 from app.forms import ProfileForm
-from libs import BlackList
 
 
 # アカウント新規作成
@@ -28,20 +27,17 @@ class UserDetail(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         # ブラックリスト読み込み
-        try:
-            str_bl = BlackList.read_bl(self.request.user.profile.black_list)
-            int_bl = BlackList.str_to_int(str_bl)
-            context["black_list"] = int_bl
-            context["profile"] = True
-            if int_bl:
-                user_list = []
-                for u in int_bl:
-                    user_list.append(User.objects.get(id=u))
-                context["user_list"] = user_list
-                context["mix_list"] = zip(int_bl, user_list)
-        except Profile.DoesNotExist:
-            context["profile"] = False
+        bl = BlackListM.objects.filter(add_user_id=self.request.user.id)
+        bl_list = []
+        u_list = []
+        for b in bl:
+            bl_list.append(b.target_user_id)
+            user = User.objects.get(id=b.target_user_id)
+            u_list.append(user.username)
+        context["mix_list"] = zip(bl_list, u_list)
+        context["black_list"] = bl_list
 
         # 該当ユーザーの投稿記事のみ取得
         try:
@@ -131,24 +127,30 @@ class PasswordChangeDone(LoginRequiredMixin, PasswordChangeDoneView):
 @login_required
 def black_list(request, pk):
     if request.method == 'POST':
-        req_profile = Profile.objects.get(user_id=request.user.id)
-        text = req_profile.black_list
+        # req_profile = Profile.objects.get(user_id=request.user.id)
+        # text = req_profile.black_list
 
         # ブラックリストへ追加
         if "add_bl" in request.POST:
-            new_bl = BlackList.add_bl(text, str(pk))
-            profile = Profile.objects.get(user_id=request.user.id)
-            profile.black_list = new_bl
-            profile.save()
+            # new_bl = BlackList.add_bl(text, str(pk))
+            # profile = Profile.objects.get(user_id=request.user.id)
+            # profile.black_list = new_bl
+            # profile.save()
+            # messages.success(request, "ブラックリストに追加しました")
+            # return redirect('accounts:user_detail', pk=request.user.id)
+            bl = BlackListM.objects.create(add_user_id=request.user.id, target_user_id=pk)
+            bl.save()
             messages.success(request, "ブラックリストに追加しました")
             return redirect('accounts:user_detail', pk=request.user.id)
 
         # ブラックリストから削除
         elif "del_bl" in request.POST:
-            new_bl = BlackList.delete_bl(text, str(pk))
-            profile = Profile.objects.get(user_id=request.user.id)
-            profile.black_list = new_bl
-            profile.save()
+            # new_bl = BlackList.delete_bl(text, str(pk))
+            # profile = Profile.objects.get(user_id=request.user.id)
+            # profile.black_list = new_bl
+            # profile.save()
+            bl = BlackListM.objects.get(add_user_id=request.user.id, target_user_id=pk)
+            bl.delete()
             messages.success(request, "ブラックリストから削除しました")
             return redirect('accounts:user_detail', pk=request.user.id)
 

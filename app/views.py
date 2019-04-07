@@ -7,8 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from .forms import ArticleForm
-from .models import Article, Profile, Like
-from libs import BlackList
+from .models import Article, Profile, Like, BlackListM
 
 
 # トップページ
@@ -31,12 +30,11 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         context = super().get_context_data(**kwargs)
 
         # ブラックリスト読み込み
-        try:
-            str_bl = BlackList.read_bl(self.request.user.profile.black_list)
-            int_bl = BlackList.str_to_int(str_bl)
-            context["black_list"] = int_bl
-        except Profile.DoesNotExist:
-            pass
+        bl = BlackListM.objects.filter(add_user_id=self.request.user.id)
+        bl_list = []
+        for b in bl:
+            bl_list.append(b.target_user_id)
+        context["black_list"] = bl_list
 
         # いいね
         like_dic = {}
